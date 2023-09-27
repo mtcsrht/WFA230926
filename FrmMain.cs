@@ -16,8 +16,15 @@ namespace WFA230926
         {
             InitializeComponent();
             btnStart.Click += BtnStart_Click;
+            nudOszlop.ValueChanged += Szamolas;
+            nudSor.ValueChanged += Szamolas;
         }
+        private void Szamolas(object sender, EventArgs e)
+        {
+            int optAknaSzam = (int)((nudOszlop.Value * nudSor.Value) * 0.2M);
 
+            nudAknaSzam.Value = optAknaSzam;
+        }
         private void BtnStart_Click(object sender, EventArgs e)
         {
             this.Hide();

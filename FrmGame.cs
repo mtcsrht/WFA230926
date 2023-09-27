@@ -17,6 +17,7 @@ namespace WFA230926
         public int Sorok { get; set; }
         public int Aknak { get; set; }
         public Button[,] Aknamezo { get; set; }
+        public bool[,] AknaPos { get; set; }
 
         public FrmGame(int o, int s, int a)
         {
@@ -25,6 +26,23 @@ namespace WFA230926
             Aknak = a;
             InitializeComponent();
             InitAknamezo();
+            InitAknaPos();
+        }
+
+        private void InitAknaPos()
+        {
+            AknaPos = new bool[Sorok, Oszlopok];
+            for (int i = 0; i < Aknak;)
+            {
+                int randomSor = rnd.Next(Sorok);
+                int randomOslzop = rnd.Next(Oszlopok);
+
+                if (!AknaPos[randomSor, randomOslzop])
+                {
+                    AknaPos[randomSor, randomOslzop] = true;
+                    i++;
+                }
+            }
         }
 
         private void InitAknamezo()
@@ -51,10 +69,26 @@ namespace WFA230926
 
         private void AknamezoBtn_Click(object sender, EventArgs e)
         {
-            (sender as Button).BackColor = Color.FromArgb(
-                red: rnd.Next(256),
-                green: rnd.Next(256),
-                blue: rnd.Next(256));
+
+            var crds = MatrixIndexOf(sender as Button);
+            if (AknaPos[crds.s, crds.o])
+            {
+                (sender as Button).BackColor = Color.Red;
+            }
+            else  (sender as Button).BackColor = Color.Green;
+
+        }
+
+        private (int s, int o)MatrixIndexOf(Button button)
+        {
+            for (int s = 0; s < Aknamezo.GetLength(0); s++)
+            {
+                for (int o = 0; o < Aknamezo.GetLength(1); o++)
+                {
+                    if (Aknamezo[s, o].Equals(button)) return (s, o);
+                }
+            }
+            throw new Exception("error"); 
         }
     }
 }
