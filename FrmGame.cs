@@ -60,23 +60,113 @@ namespace WFA230926
                             y: s * 50,
                             width: 50,
                             height: 50),
+                        BackColor = Color.FromArgb(130, Color.Gray),
+                        Font = new Font("Arial", 20, FontStyle.Bold)
                     };
-                    Aknamezo[s, o].Click += AknamezoBtn_Click;
+                    Aknamezo[s, o].MouseUp += AknamezoBtnMouseUp;
                     this.Controls.Add(Aknamezo[s, o]);
                 }
             }
         }
 
-        private void AknamezoBtn_Click(object sender, EventArgs e)
+        private void AknamezoBtnMouseUp(object sender, MouseEventArgs e)
         {
 
-            var crds = MatrixIndexOf(sender as Button);
-            if (AknaPos[crds.s, crds.o])
+            if (e.Button == MouseButtons.Right && (sender as Button).Text.Length == 0)
             {
-                (sender as Button).BackColor = Color.Red;
-            }
-            else  (sender as Button).BackColor = Color.Green;
 
+                if ((sender as Button).BackColor == Color.Black)
+                {
+                    (sender as Button).BackColor = Color.Gray;
+                }
+                else
+                {
+                    (sender as Button).BackColor = Color.Black;
+                }
+            }
+            else if(e.Button == MouseButtons.Left)
+            {
+                var crds = MatrixIndexOf(sender as Button);
+                if (AknaPos[crds.s, crds.o])
+                {
+                    //theend
+                    (sender as Button).BackColor = Color.Red;
+                }
+                else
+                {
+                    int kasz = KornyezoAknakSzama(crds);
+                    (sender as Button).BackColor = Color.White;
+
+                    switch (kasz)
+                    {
+                        case 0: (sender as Button).ForeColor = Color.White; break;
+                        case 1: (sender as Button).ForeColor = Color.Blue; break;
+                        case 2: (sender as Button).ForeColor = Color.DarkGreen; break;
+                        case 3: (sender as Button).ForeColor = Color.Red; break;
+                        case 4: (sender as Button).ForeColor = Color.DarkBlue; break;
+                        case 5: (sender as Button).ForeColor = Color.DarkRed; break;
+                        case 6: (sender as Button).ForeColor = Color.Cyan; break;
+                        case 7: (sender as Button).ForeColor = Color.Black; break;
+                        case 8: (sender as Button).ForeColor = Color.Gray; break;
+                        default:
+                            throw new Exception("Hiba!");
+                            break;
+                    }
+
+                    (sender as Button).Text = kasz.ToString();
+
+                    if(kasz == 0)
+                    {
+                       var kornyezoGombok = GetKornyezoGombok((sender as Button));
+                        foreach (var item in kornyezoGombok)
+                        {
+                            AknamezoBtnMouseUp(item, e);
+                        }
+                        
+                    }
+
+                }
+            }
+        }
+
+        private List<Button> GetKornyezoGombok(Button button)
+        {
+            var crds = MatrixIndexOf(button);
+            var kornyezoGombok = new List<Button>();
+            for (int s = crds.s - 1; s <= crds.s + 1; s++)
+            {
+                for (int o = crds.o - 1; o <= crds.o + 1; o++)
+                {
+                    if ((s != crds.s || crds.o != o)
+                        && s >= 0
+                        && s < Aknamezo.GetLength(0)
+                        && o >= 0
+                        && o < Aknamezo.GetLength(1)
+                        && Aknamezo[s, o].Text.Length == 0) kornyezoGombok.Add(Aknamezo[s, o]);
+
+                }
+            }
+            return kornyezoGombok;
+        }
+
+        private int KornyezoAknakSzama((int s, int o) crds)
+        {
+            int aknakSzama = 0;
+
+            for (int s = crds.s-1; s <= crds.s+1; s++)
+            {
+                for (int o = crds.o-1; o <= crds.o+1; o++)
+                {
+                    if ((s != crds.s || crds.o != o)
+                        && s >= 0
+                        && s < AknaPos.GetLength(0)
+                        && o >= 0
+                        && o < AknaPos.GetLength(1)
+                        && AknaPos[s, o]) aknakSzama++;
+
+                }
+            }
+            return aknakSzama;
         }
 
         private (int s, int o)MatrixIndexOf(Button button)
